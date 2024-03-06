@@ -1,0 +1,92 @@
+-- 1.28. Unha nova normativa non permite que as comisións superen o 10% do salario. Mostrar información ordenada por número de departamento, dos departamentos nos que exista algún empregado que incumpra esta normativa.
+
+USE traballadores;
+
+SELECT DISTINCT empDepartamento AS "Departamento" 
+FROM empregado 
+WHERE empComision > empSalario * 10 / 100 
+ORDER BY empDepartamento;
+
+-- 1.29. A campaña de axuda familiar posta en marcha pola empresa, establece que os empregados que teñan máis de 3 fillos, cobrarán unha paga extra de 30 euros por fillo a partir do terceiro e incluíndo este. Mostrar nome, salario, número de fillos, importe da paga extra e salario mensual final (salario+extra) dos empregados, ordenados alfabeticamente polo nome, aplicando a axuda familiar.
+
+SELECT 	empNome, 
+	empSalario, 
+        empFillos,
+        (empFillos-2) * 30 + empSalario AS "Salario mensual final",
+        empSalario + ifnull(empComision,0) + (empFillos -2) * 30
+FROM empregado
+WHERE empFillos >= 3
+ORDER BY empNome;
+        
+
+
+-- 1.30. Mostrar os nomes dos empregados con apelido 'MORA' ou que empece por 'MORA' ordenados alfabeticamente.
+SELECT * 
+FROM  empregado
+WHERE empNome LIKE "MORA%"
+ORDER BY empNome;
+
+-- WHERE REGEXP "^MORA$|^MORA"
+
+
+
+
+-- 1.31. A empresa vai organizar un espectáculo para os fillos dos empregados que durará dous días. O primeiro día invitarase aos empregados con apelido que empece polas letras dende a 'A' ata a 'L', ambas inclusive. O segundo día invitarase ao resto dos empregados. Cada empregado recibirá unha invitación por fillo e dúas máis. Cada fillo recibirá un regalo durante o espectáculo. Mostrar unha lista ordenada alfabeticamente polo nome do empregado na que aparezan os nomes dos empregados que se invitarán no primeiro día, o número de invitación que lle corresponden e o número de regalos que hai que preparar para el.
+SELECT 	empNome,
+	empFillos + 2 AS "Invitaciones",
+        empFillos AS "Número de regalos"
+FROM empregado
+WHERE empFillos > 0
+AND empNome REGEXP "^[A-L]"
+ORDER BY empNome;
+
+-- AND empNome BETWEEN "A" and "M" (Con esto coge también los que se apelliden M a secas, pero bueno, nadie se apellida así)
+
+
+
+-- 1.32. Mostrar os nomes e salarios dos empregados que cumpran algunha das seguintes condicións: 
+    -- • Non teñen fillos e gañan máis de 1200 euros.
+    -- • Teñen fillos e gañan menos de 1800 euros.
+
+SELECT	empNome,
+	empSalario
+FROM empregado
+WHERE (empFillos = 0 AND empSalario > 1200)
+OR (empFillos IS NULL AND empsalario > 1200)
+OR (empFillos > 0 AND empSalario < 1800);
+
+
+-- 1.33. Mostrar nome e salario base dos empregados que non teñen fillos ordenados de maior a menor polo salario base.
+
+SELECT 	empNome
+	empSalario
+FROM empregado
+WHERE empFillos = 0
+OR empFillos IS NULL
+ORDER BY empSalario DESC;
+	
+
+
+
+-- 1.34. Mostrar por orden alfabético, os nomes e salarios base dos empregados que traballen no departamento 111 e teñan unha comisión que supere o 15% do seu salario base.
+
+SELECT	empNome,
+	empSalario
+FROM empregado
+WHERE empDepartamento = 111
+AND empComision IS NOT NULL
+AND empComision > empSalario * 15 / 100
+ORDER BY empNome;
+
+
+
+
+
+-- 1.35. A empresa decide aumentar a comisión nun 15% aos empregados que teñan máis de 2 fillos. Mostrar ordenados alfabeticamente polo nome de empregado: nome do empregado, número de fillos, importe da comisión antes do aumento e importe da comisión despois do aumento.
+SELECT 	empNome,
+	empFillos,
+        empComision AS "Comisión antigua",
+        empComision * 15 / 100 AS "Comisión nueva"
+FROM empregado 
+WHERE empFillos > 2 -- AND empComision IS NOT NULL (sin esta línea el resultado debería ser el mismo)
+ORDER BY empNome;
